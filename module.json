@@ -1,0 +1,11 @@
+{
+    "name": "Base",
+    "version": "1.0.0-dev",
+    "description": "A GPL Cart installation profile",
+    "author": "Iurii Makukh <gplcart.software@gmail.com>",
+    "core": "1.x",
+    "status": true,
+    "type": "installer",
+    "license": "GPL-3.0+",
+    "php": ">= 5.6"
+}
