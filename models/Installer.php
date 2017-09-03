@@ -49,7 +49,7 @@ class Installer extends Model
             // No dependencies
             'currency', 'demo', 'device', 'error_notifier', 'export', 'filter', 'ga_report', 'image', 'import',
             'mail', 'shippo', 'social_login', 'summernote', 'zopim',
-            'autocomplete_search', 'codemirror', 'chart'
+            'autocomplete_search', 'codemirror', 'chart', 'translator'
         );
     }
 
