@@ -27,7 +27,7 @@ class Install extends BaseController
 
     /**
      * Base module model instance
-     * @var gplcart\modules\base\models\Installer $base_model
+     * @var \gplcart\modules\base\models\Installer $base_model
      */
     protected $base_model;
 
