@@ -1,7 +1,7 @@
 {
     "name": "gplcart/base",
     "type": "gplcart-module",
-    "description": "A GPL Cart installation profile",
+    "description": "A GPLCart installation profile",
     "keywords": ["gplcart", "ecommerce", "shopping cart", "gplcart module", "php"],
     "license": "GPL-3.0+",
     "require": {
