@@ -6,7 +6,6 @@
  * @license https://www.gnu.org/licenses/gpl.html GNU/GPLv3
  */
 ?>
-<h2><?php echo $this->text('Base distribution'); ?></h2>
 <p><?php echo $this->text('Your store is mostly set up, but there are a few more steps to take:'); ?></p>
 <ol>
   <li><?php echo $this->text('Adjust basic settings for your <a href="@url">main store</a>. If the store is not ready for production, set its status to "Disabled". It allows users with the right permissions to use the site while users without this permission are presented with a message that the site is under maintenance.', array('@url' => $this->url('admin/settings/store/edit/1'))); ?></li>
@@ -32,7 +31,7 @@
       <li><?php echo $this->text('Configure <a href="@url_currency">currencies</a> and their <a href="@url_module">exchange rates</a>', array('@url_currency' => $this->url('admin/settings/currency'), '@url_module' => $this->url('admin/module/settings/currency'))); ?></li>
     </ul>
   </li>
-  <li><?php echo $this->text('Add more <a href="@url_user">users</a>. You are superadmin and allowed to do everithing on the site. It\'s strongly recommended to create several administrative <a href="@url_role">roles</a> with different permissions (e.g "Boss", "Content manager") and assign them to different users.', array('@url_user' => $this->url('admin/user/list'), '@url_role' => $this->url('admin/user/role'))); ?></li>
+  <li><?php echo $this->text('Add more <a href="@url_user">users</a>. You are superadmin and allowed to do everything on the site. It\'s strongly recommended to create several administrative <a href="@url_role">roles</a> with different permissions (e.g "Boss", "Content manager") and assign them to different users.', array('@url_user' => $this->url('admin/user/list'), '@url_role' => $this->url('admin/user/role'))); ?></li>
 </ol>
 <a class="btn btn-default" href="<?php echo $this->url('', array('skip_intro' => 1)); ?>">
   <?php echo $this->text('OK'); ?>
