@@ -1,7 +1,7 @@
 {
     "name": "Base",
     "version": "1.0.0-dev",
-    "description": "A GPL Cart installation profile",
+    "description": "A GPLCart installation profile",
     "author": "Iurii Makukh <gplcart.software@gmail.com>",
     "core": "1.x",
     "status": true,
