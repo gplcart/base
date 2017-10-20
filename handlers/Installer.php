@@ -233,28 +233,15 @@ class Installer extends BaseInstaller
         $this->db = $db;
         $this->data = $data;
 
-        $this->copyFiles();
-        $this->finish();
-
+        $result = $this->finish();
         $errors = $this->getContextErrors();
 
-        return array(
-            'redirect' => 'login',
-            'severity' => empty($errors) ? 'success' : 'warning',
-            'message' => empty($errors) ? $this->getSuccessMessage() : $errors
-        );
-    }
+        if (!empty($errors)) {
+            $result['message'] = $errors;
+            $result['severity'] = 'warning';
+        }
 
-    /**
-     * Copy files
-     */
-    protected function copyFiles()
-    {
-        // Override dashboard intro template
-        // Hook "template.render" won't work as installer gets disabled after installation
-        $destination = GC_MODULE_DIR . '/backend/override/templates/backend/dashboard';
-        mkdir($destination, 0777, true);
-        copy(GC_MODULE_DIR . '/base/templates/intro.php', "$destination/intro.php");
+        return $result;
     }
 
 }
