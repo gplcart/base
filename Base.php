@@ -82,4 +82,15 @@ class Base extends Module
         }
     }
 
+    /**
+     * Implements hook "template.render"
+     * @param array $templates
+     */
+    public function hookTemplateRender(array &$templates)
+    {
+        if (substr($templates[0], -15) === 'dashboard/intro' && $this->config->get('installer') === 'base') {
+            $templates[0] = $this->getTemplate('base', 'intro');
+        }
+    }
+
 }
