@@ -41,16 +41,13 @@ class Installer extends Model
      */
     public function getRequiredModules()
     {
-        return array(
-            // Has Dependencies
-            'jquery_mobile', 'mobile',
-            'backup', 'installer', 'editor',
-            'omnipay_library', 'authorize', 'twocheckout', 'stripe',
-            // No dependencies
-            'currency', 'demo', 'device', 'error_notifier', 'export', 'filter', 'ga_report', 'image', 'import',
-            'mail', 'shippo', 'social_login', 'summernote', 'zopim',
-            'autocomplete_search', 'codemirror', 'chart', 'translator'
-        );
+        static $modules = null;
+
+        if (!isset($modules)) {
+            $modules = require __DIR__ . '/../config/modules.php';
+        }
+
+        return $modules;
     }
 
     /**
