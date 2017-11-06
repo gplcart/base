@@ -154,7 +154,7 @@ class Install extends BaseController
      */
     protected function controlAccessStepInstall()
     {
-        if (!$this->config->exists()) {
+        if (!$this->config->isInitialized()) {
             $this->redirect('install');
         }
 

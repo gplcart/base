@@ -9,15 +9,21 @@
 
 namespace gplcart\modules\base\models;
 
-use gplcart\core\Model,
-    gplcart\core\Container;
+use gplcart\core\Container,
+    gplcart\core\Config;
 use gplcart\core\models\Language as LanguageModel;
 
 /**
  * Manages basic behaviors and data related to Base model
  */
-class Installer extends Model
+class Installer
 {
+
+    /**
+     * Config class instance
+     * @var \gplcart\core\Config $config
+     */
+    protected $config;
 
     /**
      * Language model instance
@@ -26,12 +32,12 @@ class Installer extends Model
     protected $language;
 
     /**
+     * @param Config $config
      * @param LanguageModel $language
      */
-    public function __construct(LanguageModel $language)
+    public function __construct(Config $config, LanguageModel $language)
     {
-        parent::__construct();
-
+        $this->config = $config;
         $this->language = $language;
     }
 

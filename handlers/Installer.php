@@ -9,6 +9,11 @@
 
 namespace gplcart\modules\base\handlers;
 
+use gplcart\core\Config;
+use gplcart\core\helpers\Cli as CliHelper,
+    gplcart\core\helpers\Session as SessionHelper;
+use gplcart\core\models\Install as InstallModel,
+    gplcart\core\models\Language as LanguageModel;
 use gplcart\core\handlers\install\Base as BaseInstaller;
 use gplcart\modules\base\models\Installer as BaseModuleModel;
 
@@ -25,11 +30,17 @@ class Installer extends BaseInstaller
     protected $base_model;
 
     /**
+     * @param Config $config
+     * @param InstallModel $install
+     * @param LanguageModel $language
+     * @param SessionHelper $session
+     * @param CliHelper $cli
      * @param BaseModuleModel $base_model
      */
-    public function __construct(BaseModuleModel $base_model)
+    public function __construct(Config $config, InstallModel $install, LanguageModel $language,
+            SessionHelper $session, CliHelper $cli, BaseModuleModel $base_model)
     {
-        parent::__construct();
+        parent::__construct($config, $install, $language, $session, $cli);
 
         $this->base_model = $base_model;
     }
