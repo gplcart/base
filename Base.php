@@ -26,6 +26,8 @@ class Base extends Module
         parent::__construct($config);
     }
 
+    /* ---------------------- Hooks ---------------------- */
+
     /**
      * Implements hook "route.list"
      * @param array $routes
@@ -44,6 +46,36 @@ class Base extends Module
      * @param array $handlers
      */
     public function hookInstallHandlers(array &$handlers)
+    {
+        $this->setInstallHandlers($handlers);
+    }
+
+    /**
+     * Implements hook "install.before"
+     * @param array $data
+     * @param mixed $result
+     */
+    public function hookInstallBefore(array $data, &$result)
+    {
+        $this->checkRequiredModules($data, $result);
+    }
+
+    /**
+     * Implements hook "template.render"
+     * @param array $templates
+     */
+    public function hookTemplateRender(array &$templates)
+    {
+        $this->replaceTemplates($templates);
+    }
+
+    /* ---------------------- Helpers ---------------------- */
+
+    /**
+     * Adds installation handlers
+     * @param array $handlers
+     */
+    protected function setInstallHandlers(array &$handlers)
     {
         $language = $this->getLanguage();
 
@@ -65,11 +97,11 @@ class Base extends Module
     }
 
     /**
-     * Implements hook "install.before"
+     * Check if all required modules in place
      * @param array $data
-     * @param mixed $result
+     * @param array $result
      */
-    public function hookInstallBefore(array $data, &$result)
+    protected function checkRequiredModules(array $data, &$result)
     {
         /* @var $model \gplcart\modules\base\models\Installer */
         $model = $this->getModel('Installer', 'base');
@@ -84,10 +116,10 @@ class Base extends Module
     }
 
     /**
-     * Implements hook "template.render"
+     * Replace system templates
      * @param array $templates
      */
-    public function hookTemplateRender(array &$templates)
+    protected function replaceTemplates(array &$templates)
     {
         if (substr($templates[0], -15) === 'dashboard/intro' && $this->config->get('installer') === 'base') {
             $templates[0] = $this->getTemplate('base', 'intro');
