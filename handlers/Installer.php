@@ -9,7 +9,8 @@
 
 namespace gplcart\modules\base\handlers;
 
-use gplcart\core\Config;
+use gplcart\core\Config,
+    gplcart\core\Module;
 use gplcart\core\helpers\Cli as CliHelper,
     gplcart\core\helpers\Session as SessionHelper;
 use gplcart\core\models\Install as InstallModel,
@@ -30,18 +31,26 @@ class Installer extends BaseInstaller
     protected $base_model;
 
     /**
+     * Module class instance
+     * @var \gplcart\core\Module $module
+     */
+    protected $module;
+
+    /**
      * @param Config $config
      * @param InstallModel $install
      * @param LanguageModel $language
      * @param SessionHelper $session
      * @param CliHelper $cli
+     * @param Module $module
      * @param BaseModuleModel $base_model
      */
     public function __construct(Config $config, InstallModel $install, LanguageModel $language,
-            SessionHelper $session, CliHelper $cli, BaseModuleModel $base_model)
+            SessionHelper $session, CliHelper $cli, Module $module, BaseModuleModel $base_model)
     {
         parent::__construct($config, $install, $language, $session, $cli);
 
+        $this->module = $module;
         $this->base_model = $base_model;
     }
 
@@ -223,7 +232,7 @@ class Installer extends BaseInstaller
         }
 
         /* @var $module \gplcart\modules\demo\Demo */
-        $module = $this->config->getModuleInstance('demo');
+        $module = $this->module->getInstance('demo');
         $result = $module->create($this->getContext('store_id'), $data['demo_handler_id']);
 
         if ($result !== true) {

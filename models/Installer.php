@@ -10,7 +10,7 @@
 namespace gplcart\modules\base\models;
 
 use gplcart\core\Container,
-    gplcart\core\Config;
+    gplcart\core\Module;
 use gplcart\core\models\Language as LanguageModel;
 
 /**
@@ -20,10 +20,10 @@ class Installer
 {
 
     /**
-     * Config class instance
-     * @var \gplcart\core\Config $config
+     * Module class instance
+     * @var \gplcart\core\Module $module
      */
-    protected $config;
+    protected $module;
 
     /**
      * Language model instance
@@ -32,12 +32,12 @@ class Installer
     protected $language;
 
     /**
-     * @param Config $config
+     * @param Module $module
      * @param LanguageModel $language
      */
-    public function __construct(Config $config, LanguageModel $language)
+    public function __construct(Module $module, LanguageModel $language)
     {
-        $this->config = $config;
+        $this->module = $module;
         $this->language = $language;
     }
 
@@ -63,7 +63,7 @@ class Installer
     public function hasAllRequiredModules()
     {
         $required = $this->getRequiredModules();
-        $available = array_keys($this->config->getModules());
+        $available = array_keys($this->module->getList());
         $difference = array_diff($required, array_intersect($required, $available));
 
         return empty($difference);
@@ -111,7 +111,7 @@ class Installer
     public function createDemo($store_id, $handler_id)
     {
         /* @var $module \gplcart\modules\demo\Demo */
-        $module = $this->config->getModuleInstance('demo');
+        $module = $this->module->getInstance('demo');
         return $module->create($store_id, $handler_id);
     }
 
@@ -122,7 +122,7 @@ class Installer
     public function getDemoHandlers()
     {
         /* @var $module \gplcart\modules\demo\Demo */
-        $module = $this->config->getModuleInstance('demo');
+        $module = $this->module->getInstance('demo');
         return $module->getHandlers();
     }
 

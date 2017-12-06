@@ -9,24 +9,28 @@
 
 namespace gplcart\modules\base;
 
-use gplcart\core\Module,
+use gplcart\core\Container,
     gplcart\core\Config;
 
 /**
  * Main class for Base module
  */
-class Base extends Module
+class Base
 {
+
+    /**
+     * Config class instance
+     * @var \gplcart\core\Config $config
+     */
+    protected $config;
 
     /**
      * @param Config $config
      */
     public function __construct(Config $config)
     {
-        parent::__construct($config);
+        $this->config = $config;
     }
-
-    /* ---------------------- Hooks ---------------------- */
 
     /**
      * Implements hook "route.list"
@@ -69,8 +73,6 @@ class Base extends Module
         $this->replaceTemplates($templates);
     }
 
-    /* ---------------------- Helpers ---------------------- */
-
     /**
      * Adds installation handlers
      * @param array $handlers
@@ -103,10 +105,7 @@ class Base extends Module
      */
     protected function checkRequiredModules(array $data, &$result)
     {
-        /* @var $model \gplcart\modules\base\models\Installer */
-        $model = $this->getModel('Installer', 'base');
-
-        if ($data['installer'] === 'base' && empty($data['step']) && !$model->hasAllRequiredModules()) {
+        if ($data['installer'] === 'base' && empty($data['step']) && !$this->getModel()->hasAllRequiredModules()) {
             $result = array(
                 'redirect' => '',
                 'severity' => 'warning',
@@ -122,8 +121,26 @@ class Base extends Module
     protected function replaceTemplates(array &$templates)
     {
         if (substr($templates[0], -15) === 'dashboard/intro' && $this->config->get('installer') === 'base') {
-            $templates[0] = $this->getTemplate('base', 'intro');
+            $templates[0] = __DIR__ . '/templates/intro';
         }
+    }
+
+    /**
+     * Returns the module model
+     * @return \gplcart\modules\base\models\Installer
+     */
+    protected function getModel()
+    {
+        return Container::get('gplcart\\modules\\base\\models\\Installer');
+    }
+
+    /**
+     * Language model instance
+     * @return \gplcart\core\models\Language $language
+     */
+    protected function getLanguage()
+    {
+        return Container::get('gplcart\\core\\models\\Language');
     }
 
 }
