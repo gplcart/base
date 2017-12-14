@@ -79,7 +79,7 @@ class Base
      */
     protected function setInstallHandlers(array &$handlers)
     {
-        $language = $this->getLanguage();
+        $language = $this->getTranslationModel();
 
         $handlers['base'] = array(
             'module' => 'base',
@@ -90,10 +90,10 @@ class Base
                 3 => array('title' => $language->text('Finish installation'))
             ),
             'handlers' => array(
-                'install' => array('gplcart\\modules\\base\\handlers\\Installer', 'install'),
-                'install_1' => array('gplcart\\modules\\base\\handlers\\Installer', 'installModules'),
-                'install_2' => array('gplcart\\modules\\base\\handlers\\Installer', 'installDemo'),
-                'install_3' => array('gplcart\\modules\\base\\handlers\\Installer', 'installFinish')
+                'install' => array('gplcart\\modules\\base\\handlers\\Install', 'install'),
+                'install_1' => array('gplcart\\modules\\base\\handlers\\Install', 'installModules'),
+                'install_2' => array('gplcart\\modules\\base\\handlers\\Install', 'installDemo'),
+                'install_3' => array('gplcart\\modules\\base\\handlers\\Install', 'installFinish')
             )
         );
     }
@@ -109,7 +109,7 @@ class Base
             $result = array(
                 'redirect' => '',
                 'severity' => 'warning',
-                'message' => $this->getLanguage()->text('You cannot use this installer because some modules are missed in your distribution')
+                'message' => $this->getTranslationModel()->text('You cannot use this installer because some modules are missed in your distribution')
             );
         }
     }
@@ -131,16 +131,16 @@ class Base
      */
     protected function getModel()
     {
-        return Container::get('gplcart\\modules\\base\\models\\Installer');
+        return Container::get('gplcart\\modules\\base\\models\\Install');
     }
 
     /**
-     * Language model instance
-     * @return \gplcart\core\models\Language $language
+     * Translation UI model instance
+     * @return \gplcart\core\models\Translation
      */
-    protected function getLanguage()
+    protected function getTranslationModel()
     {
-        return Container::get('gplcart\\core\\models\\Language');
+        return Container::get('gplcart\\core\\models\\Translation');
     }
 
 }

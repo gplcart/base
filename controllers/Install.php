@@ -11,7 +11,7 @@ namespace gplcart\modules\base\controllers;
 
 use gplcart\core\Controller as BaseController;
 use gplcart\core\models\Install as InstallModel;
-use gplcart\modules\base\models\Installer as BaseModuleModel;
+use gplcart\modules\base\models\Install as ModuleModel;
 
 /**
  * Handles incoming requests and outputs data related to Base module
@@ -57,9 +57,9 @@ class Install extends BaseController
 
     /**
      * @param InstallModel $install
-     * @param BaseModuleModel $base_model
+     * @param ModuleModel $base_model
      */
-    public function __construct(InstallModel $install, BaseModuleModel $base_model)
+    public function __construct(InstallModel $install, ModuleModel $base_model)
     {
         parent::__construct();
 

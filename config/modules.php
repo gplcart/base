@@ -7,12 +7,34 @@
  * @license https://www.gnu.org/licenses/gpl.html GNU/GPLv3
  */
 return array(
-    // Has Dependencies
-    'jquery_mobile', 'mobile',
-    'backup', 'installer', 'editor',
-    'omnipay_library', 'authorize', 'twocheckout', 'stripe', 'jquery_file_upload', 'file_manager',
+    // With dependencies
+    'jquery_mobile',
+    'mobile',
+    'backup',
+    'installer',
+    'editor',
+    'omnipay_library',
+    'authorize',
+    'twocheckout',
+    'stripe',
     // No dependencies
-    'currency', 'demo', 'device', 'error_notifier', 'export', 'filter', 'ga_report', 'image', 'import',
-    'mail', 'shippo', 'social_login', 'summernote', 'zopim',
-    'autocomplete_search', 'codemirror', 'chart', 'translator'
+    'file_manager',
+    'currency',
+    'demo',
+    'device',
+    'error_notifier',
+    'export',
+    'filter',
+    'ga_report',
+    'image',
+    'import',
+    'mail',
+    'shippo',
+    'social_login',
+    'summernote',
+    'zopim',
+    'autocomplete_search',
+    'codemirror',
+    'chart',
+    'translator'
 );

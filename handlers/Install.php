@@ -9,26 +9,21 @@
 
 namespace gplcart\modules\base\handlers;
 
-use gplcart\core\Config,
-    gplcart\core\Module;
-use gplcart\core\helpers\Cli as CliHelper,
-    gplcart\core\helpers\Session as SessionHelper;
-use gplcart\core\models\Install as InstallModel,
-    gplcart\core\models\Language as LanguageModel;
+use gplcart\core\Module;
 use gplcart\core\handlers\install\Base as BaseInstaller;
-use gplcart\modules\base\models\Installer as BaseModuleModel;
+use gplcart\modules\base\models\Install as ModuleModel;
 
 /**
  * Contains methods for installing Base profile
  */
-class Installer extends BaseInstaller
+class Install extends BaseInstaller
 {
 
     /**
      * Base module installer model
      * @var \gplcart\modules\base\models\Installer $installer
      */
-    protected $base_model;
+    protected $model;
 
     /**
      * Module class instance
@@ -37,21 +32,15 @@ class Installer extends BaseInstaller
     protected $module;
 
     /**
-     * @param Config $config
-     * @param InstallModel $install
-     * @param LanguageModel $language
-     * @param SessionHelper $session
-     * @param CliHelper $cli
      * @param Module $module
-     * @param BaseModuleModel $base_model
+     * @param ModuleModel $model
      */
-    public function __construct(Config $config, InstallModel $install, LanguageModel $language,
-            SessionHelper $session, CliHelper $cli, Module $module, BaseModuleModel $base_model)
+    public function __construct(Module $module, ModuleModel $model)
     {
-        parent::__construct($config, $install, $language, $session, $cli);
+        parent::__construct();
 
+        $this->model = $model;
         $this->module = $module;
-        $this->base_model = $base_model;
     }
 
     /**
@@ -71,7 +60,6 @@ class Installer extends BaseInstaller
         }
 
         $this->start();
-
         $result = $this->process();
 
         if ($result !== true) {
@@ -91,35 +79,59 @@ class Installer extends BaseInstaller
      */
     protected function installCli()
     {
-        $this->cli->line($this->language->text('Initial configuration...'));
         $result = $this->process();
 
         if ($result !== true) {
             return $result;
         }
 
-        $this->data['step'] = 1;
-        $this->cli->line($this->language->text('Configuring modules...'));
-        $result_modules = $this->installModules($this->data, $this->db);
+        $result1 = $this->installCliStep1();
 
-        if ($result_modules['severity'] !== 'success') {
-            return $result_modules;
+        if ($result1['severity'] !== 'success') {
+            return $result1;
         }
 
-        $title = $this->language->text('Please select a demo content package (enter a number)');
+        $this->installCliStep2();
+        return $this->installCliStep3();
+    }
+
+    /**
+     * Process step 1 in CLI mode
+     * @return array
+     */
+    protected function installCliStep1()
+    {
+        $this->data['step'] = 1;
+        $this->setCliMessage('Configuring modules...');
+        return $this->installModules($this->data, $this->db);
+    }
+
+    /**
+     * Process step 2 in CLI mode
+     */
+    protected function installCliStep2()
+    {
+        $title = $this->translation->text('Please select a demo content package (enter a number)');
         $this->data['demo_handler_id'] = $this->cli->menu($this->getDemoOptions(), '', $title);
 
         if (!empty($this->data['demo_handler_id'])) {
 
             $this->data['step'] = 2;
-            $this->cli->line($this->language->text('Installing demo content...'));
-            $result_demo = $this->installDemo($this->data, $this->db);
+            $this->setCliMessage('Installing demo content...');
+            $result = $this->installDemo($this->data, $this->db);
 
-            if ($result_demo['severity'] !== 'success') {
-                $this->cli->error($result_demo['message']);
+            if ($result['severity'] !== 'success') {
+                $this->cli->error($result['message']);
             }
         }
+    }
 
+    /**
+     * Precess step 3 in CLI mode
+     * @return array
+     */
+    protected function installCliStep3()
+    {
         $this->data['step'] = 3;
         return $this->installFinish($this->data, $this->db);
     }
@@ -130,9 +142,10 @@ class Installer extends BaseInstaller
      */
     protected function getDemoOptions()
     {
-        $options = array('' => $this->language->text('No demo'));
+        $options = array(
+            '' => $this->translation->text('No demo'));
 
-        foreach ($this->base_model->getDemoHandlers() as $id => $handler) {
+        foreach ($this->model->getDemoHandlers() as $id => $handler) {
             $options[$id] = $handler['title'];
         }
 
@@ -150,7 +163,7 @@ class Installer extends BaseInstaller
         $this->db = $db;
         $this->data = $data;
 
-        $result = $this->base_model->installModules();
+        $result = $this->model->installModules();
 
         if ($result === true) {
 
@@ -163,13 +176,12 @@ class Installer extends BaseInstaller
             );
         }
 
-        $message = $this->language->text('An error occurred during installing required modules');
-        $this->setContextError($this->data['step'], $message);
+        $this->setContextError($this->data['step'], $result);
 
         return array(
             'redirect' => '',
             'severity' => 'danger',
-            'message' => $message
+            'message' => $result
         );
     }
 
@@ -188,12 +200,13 @@ class Installer extends BaseInstaller
      */
     protected function configureModuleDevice()
     {
-        $settings = array();
         $store_id = $this->getContext('store_id');
+
+        $settings = array();
         $settings['theme'][$store_id]['mobile'] = 'mobile';
         $settings['theme'][$store_id]['tablet'] = 'mobile';
 
-        return $this->base_model->setModuleSettings('device', $settings);
+        return $this->module->setSettings('device', $settings);
     }
 
     /**
@@ -202,12 +215,19 @@ class Installer extends BaseInstaller
      */
     protected function configureModuleGaReport()
     {
-        $settings = array(
-            'dashboard' => array('visit_date', 'pageview_date',
-                'content_statistic', 'top_pages', 'source', 'keyword', 'audience')
+        $info = $this->module->getInfo('ga_report');
+
+        $info['settings']['dashboard'] = array(
+            'visit_date',
+            'pageview_date',
+            'content_statistic',
+            'top_pages',
+            'source',
+            'keyword',
+            'audience'
         );
 
-        return $this->base_model->setModuleSettings('ga_report', $settings);
+        return $this->module->setSettings('ga_report', $info['settings']);
     }
 
     /**
@@ -218,6 +238,8 @@ class Installer extends BaseInstaller
      */
     public function installDemo(array $data, $db)
     {
+        set_time_limit(0);
+
         $this->db = $db;
         $this->data = $data;
 
@@ -231,9 +253,7 @@ class Installer extends BaseInstaller
             return $success_result;
         }
 
-        /* @var $module \gplcart\modules\demo\Demo */
-        $module = $this->module->getInstance('demo');
-        $result = $module->create($this->getContext('store_id'), $data['demo_handler_id']);
+        $result = $this->model->getDemoModule()->create($this->getContext('store_id'), $data['demo_handler_id']);
 
         if ($result !== true) {
             $this->setContextError($this->data['step'], $result);
