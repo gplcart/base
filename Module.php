@@ -9,13 +9,13 @@
 
 namespace gplcart\modules\base;
 
-use gplcart\core\Container,
-    gplcart\core\Config;
+use gplcart\core\Config,
+    gplcart\core\Container;
 
 /**
  * Main class for Base module
  */
-class Base
+class Module
 {
 
     /**
