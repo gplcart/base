@@ -9,15 +9,17 @@
 
 namespace gplcart\modules\base\models;
 
-use gplcart\core\Container,
-    gplcart\core\Module;
+use gplcart\core\Module,
+    gplcart\core\Container;
 use gplcart\core\models\Translation as TranslationModel;
+use gplcart\core\exceptions\Dependency as DependencyException;
 
 /**
  * Installer model
  */
 class Install
 {
+
     /**
      * Translation UI model instance
      * @var \gplcart\core\models\Translation $translation
@@ -78,15 +80,6 @@ class Install
     }
 
     /**
-     * Returns Module model class instance
-     * @return \gplcart\core\models\Module
-     */
-    protected function getModuleModel()
-    {
-        return Container::get('gplcart\\core\\models\\Module');
-    }
-
-    /**
      * Create demo content using Demo module
      * @param integer $store_id
      * @param string $handler_id
@@ -108,18 +101,28 @@ class Install
 
     /**
      * Returns Demo module instance
-     * @return \gplcart\modules\demo\Demo
-     * @throws \RuntimeException
+     * @return \gplcart\modules\demo\Module
+     * @throws DependencyException
      */
     public function getDemoModule()
     {
+        /* @var \gplcart\modules\demo\Module $instance */
         $instance = $this->module->getInstance('demo');
 
-        if ($instance instanceof \gplcart\modules\demo\Demo) {
+        if (is_object($instance)) {
             return $instance;
         }
 
-        throw new \RuntimeException('Failed to get instance of Demo module');
+        throw new DependencyException('Failed to get instance of Demo module');
+    }
+
+    /**
+     * Returns Module model class instance
+     * @return \gplcart\core\models\Module
+     */
+    protected function getModuleModel()
+    {
+        return Container::get('gplcart\\core\\models\\Module');
     }
 
 }
