@@ -21,7 +21,7 @@ class Install extends BaseInstaller
 
     /**
      * Base module installer model
-     * @var \gplcart\modules\base\models\Installer $installer
+     * @var \gplcart\modules\base\models\Install $installer
      */
     protected $model;
 

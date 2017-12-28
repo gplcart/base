@@ -127,7 +127,7 @@ class Module
 
     /**
      * Returns the module model
-     * @return \gplcart\modules\base\models\Installer
+     * @return \gplcart\modules\base\models\Install
      */
     protected function getModel()
     {
