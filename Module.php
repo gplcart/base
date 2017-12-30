@@ -105,7 +105,8 @@ class Module
      */
     protected function checkRequiredModules(array $data, &$result)
     {
-        if ($data['installer'] === 'base' && empty($data['step']) && !$this->getModel()->hasAllRequiredModules()) {
+        if ($data['installer'] === 'base' && empty($data['step'])//
+                && !$this->getModel()->hasAllRequiredModules()) {
             $result = array(
                 'redirect' => '',
                 'severity' => 'warning',
