@@ -11,7 +11,7 @@ namespace gplcart\modules\base\handlers;
 
 use gplcart\core\Module;
 use gplcart\core\handlers\install\Base as BaseInstaller;
-use gplcart\modules\base\models\Install as ModuleModel;
+use gplcart\modules\base\models\Install as ModuleInstallModel;
 
 /**
  * Contains methods for installing Base profile
@@ -23,7 +23,7 @@ class Install extends BaseInstaller
      * Base module installer model
      * @var \gplcart\modules\base\models\Install $installer
      */
-    protected $model;
+    protected $install_model;
 
     /**
      * Module class instance
@@ -33,14 +33,14 @@ class Install extends BaseInstaller
 
     /**
      * @param Module $module
-     * @param ModuleModel $model
+     * @param ModuleModel $install_model
      */
-    public function __construct(Module $module, ModuleModel $model)
+    public function __construct(Module $module, ModuleInstallModel $install_model)
     {
         parent::__construct();
 
-        $this->model = $model;
         $this->module = $module;
+        $this->install_model = $install_model;
     }
 
     /**
@@ -120,7 +120,9 @@ class Install extends BaseInstaller
             $this->setCliMessage('Installing demo content...');
             $result = $this->installDemo($this->data, $this->db);
 
-            if ($result['severity'] !== 'success') {
+            if ($result['severity'] === 'success') {
+                $this->setContext('demo_handler_id', $this->data['demo_handler_id']);
+            } else {
                 $this->cli->error($result['message']);
             }
         }
@@ -142,10 +144,9 @@ class Install extends BaseInstaller
      */
     protected function getDemoOptions()
     {
-        $options = array(
-            '' => $this->translation->text('No demo'));
+        $options = array('' => $this->translation->text('No demo'));
 
-        foreach ($this->model->getDemoHandlers() as $id => $handler) {
+        foreach ($this->install_model->getDemoHandlers() as $id => $handler) {
             $options[$id] = $handler['title'];
         }
 
@@ -163,7 +164,7 @@ class Install extends BaseInstaller
         $this->db = $db;
         $this->data = $data;
 
-        $result = $this->model->installModules();
+        $result = $this->install_model->installModules();
 
         if ($result === true) {
 
@@ -253,7 +254,7 @@ class Install extends BaseInstaller
             return $success_result;
         }
 
-        $result = $this->model->getDemoModule()->create($this->getContext('store_id'), $data['demo_handler_id']);
+        $result = $this->install_model->getDemoModule()->create($this->getContext('store_id'), $data['demo_handler_id']);
 
         if ($result !== true) {
             $this->setContextError($this->data['step'], $result);
@@ -276,9 +277,14 @@ class Install extends BaseInstaller
         $result = $this->finish();
         $errors = $this->getContextErrors();
 
-        if (!empty($errors)) {
-            $result['message'] = $errors;
+        if (empty($errors)) {
+            if ($this->getContext('demo_handler_id')) {
+                $store_id = $this->getContext('store_id');
+                $this->getStoreModel()->update($store_id, array('status' => 1));
+            }
+        } else {
             $result['severity'] = 'warning';
+            $result['message'] = implode("\n", $errors);
         }
 
         return $result;
