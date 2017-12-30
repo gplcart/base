@@ -72,7 +72,7 @@ class Install
     {
         foreach ($this->getRequiredModules() as $module_id) {
             if ($this->getModuleModel()->install($module_id) !== true) {
-                return $this->translation->text('Failed to install module %module_id', array('%module_id' => $module_id));
+                return $this->translation->text('Failed to install module @module_id', array('@module_id' => $module_id));
             }
         }
 
