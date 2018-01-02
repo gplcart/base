@@ -15,7 +15,7 @@ use gplcart\core\Config,
 /**
  * Main class for Base module
  */
-class Module
+class Main
 {
 
     /**

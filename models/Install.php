@@ -101,12 +101,12 @@ class Install
 
     /**
      * Returns Demo module instance
-     * @return \gplcart\modules\demo\Module
+     * @return \gplcart\modules\demo\Main
      * @throws DependencyException
      */
     public function getDemoModule()
     {
-        /* @var \gplcart\modules\demo\Module $instance */
+        /* @var \gplcart\modules\demo\Main $instance */
         $instance = $this->module->getInstance('demo');
 
         if (is_object($instance)) {
