@@ -21,7 +21,7 @@ return array(
     'file_manager',
     'currency',
     'demo',
-    'dev',
+    //'dev',
     'device',
     'export',
     'filter',
