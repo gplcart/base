@@ -9,8 +9,8 @@
 
 namespace gplcart\modules\base\handlers;
 
-use gplcart\core\Module;
 use gplcart\core\handlers\install\Base as BaseInstaller;
+use gplcart\core\Module;
 use gplcart\modules\base\models\Install as ModuleInstallModel;
 
 /**
@@ -33,7 +33,7 @@ class Install extends BaseInstaller
 
     /**
      * @param Module $module
-     * @param ModuleModel $install_model
+     * @param ModuleInstallModel $install_model
      */
     public function __construct(Module $module, ModuleInstallModel $install_model)
     {
@@ -284,7 +284,7 @@ class Install extends BaseInstaller
             }
         } else {
             $result['severity'] = 'warning';
-            $result['message'] = implode("\n", $errors);
+            $result['message'] = implode(PHP_EOL, $errors);
         }
 
         return $result;
