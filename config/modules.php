@@ -18,6 +18,7 @@ return array(
     'twocheckout',
     'stripe',
     // No dependencies
+    'cli',
     'file_manager',
     'currency',
     'demo',
