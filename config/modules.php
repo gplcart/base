@@ -17,6 +17,9 @@ return array(
     'authorize',
     'twocheckout',
     'stripe',
+    'gapi',
+    'ga_report',
+    'ga_chart',
     // No dependencies
     'cli',
     'file_manager',
@@ -26,7 +29,6 @@ return array(
     'device',
     'export',
     'filter',
-    'ga_report',
     'image',
     'import',
     'mail',
@@ -36,6 +38,5 @@ return array(
     'zopim',
     'autocomplete_search',
     'codemirror',
-    'chart',
     'translator'
 );
