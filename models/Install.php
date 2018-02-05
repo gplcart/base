@@ -102,18 +102,12 @@ class Install
     /**
      * Returns Demo module instance
      * @return \gplcart\modules\demo\Main
-     * @throws DependencyException
      */
     public function getDemoModule()
     {
         /* @var \gplcart\modules\demo\Main $instance */
         $instance = $this->module->getInstance('demo');
-
-        if (is_object($instance)) {
-            return $instance;
-        }
-
-        throw new DependencyException('Failed to get instance of Demo module');
+        return $instance;
     }
 
     /**
