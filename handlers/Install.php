@@ -9,9 +9,11 @@
 
 namespace gplcart\modules\base\handlers;
 
+use Exception;
 use gplcart\core\handlers\install\Base as BaseInstaller;
 use gplcart\core\Module;
 use gplcart\modules\base\models\Install as ModuleInstallModel;
+use UnexpectedValueException;
 
 /**
  * Contains methods for installing Base profile
@@ -56,58 +58,65 @@ class Install extends BaseInstaller
         $this->data['step'] = 0;
 
         if (GC_CLI) {
-            return $this->installCli();
+            $this->installCli();
+            return array();
         }
 
-        $this->start();
-        $result = $this->process();
+        try {
 
-        if ($result !== true) {
-            return $result;
+            $this->start();
+            $this->process();
+
+            return array(
+                'message' => '',
+                'severity' => 'success',
+                'redirect' => 'install/' . ($this->data['step'] + 1)
+            );
+
+        } catch (Exception $ex) {
+            return array(
+                'redirect' => '',
+                'severity' => 'warning',
+                'message' => $ex->getMessage()
+            );
         }
-
-        return array(
-            'message' => '',
-            'severity' => 'success',
-            'redirect' => 'install/' . ($this->data['step'] + 1)
-        );
     }
 
     /**
      * Install in CLI mode
-     * @return array
      */
     protected function installCli()
     {
-        $result = $this->process();
+        try {
 
-        if ($result !== true) {
-            return $result;
+            $this->process();
+            $this->installCliStep1();
+            $this->installCliStep2();
+            $this->installCliStep3();
+
+        } catch (Exception $ex) {
+            $this->cli->error($ex->getMessage());
         }
-
-        $result1 = $this->installCliStep1();
-
-        if ($result1['severity'] !== 'success') {
-            return $result1;
-        }
-
-        $this->installCliStep2();
-        return $this->installCliStep3();
     }
 
     /**
      * Process step 1 in CLI mode
-     * @return array
+     * @throws UnexpectedValueException
      */
     protected function installCliStep1()
     {
         $this->data['step'] = 1;
         $this->setCliMessage('Configuring modules...');
-        return $this->installModules($this->data, $this->db);
+        $result = $this->installModules($this->data, $this->db);
+
+        if ($result['severity'] !== 'success') {
+            throw new UnexpectedValueException($result['message']);
+        }
     }
 
     /**
      * Process step 2 in CLI mode
+     * @throws UnexpectedValueException
      */
     protected function installCliStep2()
     {
@@ -120,37 +129,26 @@ class Install extends BaseInstaller
             $this->setCliMessage('Installing demo content...');
             $result = $this->installDemo($this->data, $this->db);
 
-            if ($result['severity'] === 'success') {
-                $this->setContext('demo_handler_id', $this->data['demo_handler_id']);
-            } else {
-                $this->cli->error($result['message']);
+            if ($result['severity'] !== 'success') {
+                throw new UnexpectedValueException($result['message']);
             }
+
+            $this->setContext('demo_handler_id', $this->data['demo_handler_id']);
         }
     }
 
     /**
      * Precess step 3 in CLI mode
-     * @return array
+     * @throws UnexpectedValueException
      */
     protected function installCliStep3()
     {
         $this->data['step'] = 3;
-        return $this->installFinish($this->data, $this->db);
-    }
+        $result = $this->installFinish($this->data, $this->db);
 
-    /**
-     * Returns an array of demo content options
-     * @return array
-     */
-    protected function getDemoOptions()
-    {
-        $options = array('' => $this->translation->text('No demo'));
-
-        foreach ($this->install_model->getDemoHandlers() as $id => $handler) {
-            $options[$id] = $handler['title'];
+        if ($result['severity'] !== 'success') {
+            throw new UnexpectedValueException($result['message']);
         }
-
-        return $options;
     }
 
     /**
@@ -164,10 +162,9 @@ class Install extends BaseInstaller
         $this->db = $db;
         $this->data = $data;
 
-        $result = $this->install_model->installModules();
+        try {
 
-        if ($result === true) {
-
+            $this->install_model->installModules();
             $this->configureModules();
 
             return array(
@@ -175,60 +172,17 @@ class Install extends BaseInstaller
                 'severity' => 'success',
                 'redirect' => 'install/' . ($this->data['step'] + 1)
             );
+
+        } catch (Exception $ex) {
+
+            $this->setContextError($this->data['step'], $ex->getMessage());
+
+            return array(
+                'redirect' => '',
+                'severity' => 'danger',
+                'message' => $ex->getMessage()
+            );
         }
-
-        $this->setContextError($this->data['step'], $result);
-
-        return array(
-            'redirect' => '',
-            'severity' => 'danger',
-            'message' => $result
-        );
-    }
-
-    /**
-     * Configure module settings
-     */
-    protected function configureModules()
-    {
-        $this->configureModuleDevice();
-        $this->configureModuleGaReport();
-    }
-
-    /**
-     * Configure Device module settings
-     * @return bool
-     */
-    protected function configureModuleDevice()
-    {
-        $store_id = $this->getContext('store_id');
-
-        $settings = array();
-        $settings['theme'][$store_id]['mobile'] = 'mobile';
-        $settings['theme'][$store_id]['tablet'] = 'mobile';
-
-        return $this->module->setSettings('device', $settings);
-    }
-
-    /**
-     * Configure Google Analytics Report module settings
-     * @return bool
-     */
-    protected function configureModuleGaReport()
-    {
-        $info = $this->module->getInfo('ga_report');
-
-        $info['settings']['dashboard'] = array(
-            'visit_date',
-            'pageview_date',
-            'content_statistic',
-            'top_pages',
-            'source',
-            'keyword',
-            'audience'
-        );
-
-        return $this->module->setSettings('ga_report', $info['settings']);
     }
 
     /**
@@ -288,6 +242,64 @@ class Install extends BaseInstaller
         }
 
         return $result;
+    }
+
+    /**
+     * Returns an array of demo content options
+     * @return array
+     */
+    protected function getDemoOptions()
+    {
+        $options = array('' => $this->translation->text('No demo'));
+
+        foreach ($this->install_model->getDemoHandlers() as $id => $handler) {
+            $options[$id] = $handler['title'];
+        }
+
+        return $options;
+    }
+
+    /**
+     * Configure module settings
+     */
+    protected function configureModules()
+    {
+        $this->configureModuleDevice();
+        $this->configureModuleGaReport();
+    }
+
+    /**
+     * Configure Device module settings
+     */
+    protected function configureModuleDevice()
+    {
+        $store_id = $this->getContext('store_id');
+
+        $settings = array();
+        $settings['theme'][$store_id]['mobile'] = 'mobile';
+        $settings['theme'][$store_id]['tablet'] = 'mobile';
+
+        $this->module->setSettings('device', $settings);
+    }
+
+    /**
+     * Configure Google Analytics Report module settings
+     */
+    protected function configureModuleGaReport()
+    {
+        $info = $this->module->getInfo('ga_report');
+
+        $info['settings']['dashboard'] = array(
+            'visit_date',
+            'pageview_date',
+            'content_statistic',
+            'top_pages',
+            'source',
+            'keyword',
+            'audience'
+        );
+
+        $this->module->setSettings('ga_report', $info['settings']);
     }
 
 }
