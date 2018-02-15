@@ -9,10 +9,10 @@
 
 namespace gplcart\modules\base\models;
 
-use gplcart\core\Module,
-    gplcart\core\Container;
+use gplcart\core\Container;
 use gplcart\core\models\Translation as TranslationModel;
-use gplcart\core\exceptions\Dependency as DependencyException;
+use gplcart\core\Module;
+use RuntimeException;
 
 /**
  * Installer model
@@ -67,12 +67,14 @@ class Install
     /**
      * Install all required modules
      * @return bool
+     * @throws RuntimeException
      */
     public function installModules()
     {
         foreach ($this->getRequiredModules() as $module_id) {
             if ($this->getModuleModel()->install($module_id) !== true) {
-                return $this->translation->text('Failed to install module @module_id', array('@module_id' => $module_id));
+                $error = $this->translation->text('Failed to install module @module_id', array('@module_id' => $module_id));
+                throw new RuntimeException($error);
             }
         }
 
@@ -116,7 +118,9 @@ class Install
      */
     protected function getModuleModel()
     {
-        return Container::get('gplcart\\core\\models\\Module');
+        /** @var \gplcart\core\models\Module $instance */
+        $instance = Container::get('gplcart\\core\\models\\Module');
+        return $instance;
     }
 
 }
