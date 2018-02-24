@@ -10,7 +10,7 @@
 namespace gplcart\modules\base\models;
 
 use gplcart\core\Container;
-use gplcart\core\models\Translation as TranslationModel;
+use gplcart\core\models\Translation;
 use gplcart\core\Module;
 use RuntimeException;
 
@@ -34,9 +34,9 @@ class Install
 
     /**
      * @param Module $module
-     * @param TranslationModel $translation
+     * @param Translation $translation
      */
-    public function __construct(Module $module, TranslationModel $translation)
+    public function __construct(Module $module, Translation $translation)
     {
         $this->module = $module;
         $this->translation = $translation;

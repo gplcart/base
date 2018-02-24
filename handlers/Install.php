@@ -10,15 +10,15 @@
 namespace gplcart\modules\base\handlers;
 
 use Exception;
-use gplcart\core\handlers\install\Base as BaseInstaller;
+use gplcart\core\handlers\install\Base;
 use gplcart\core\Module;
-use gplcart\modules\base\models\Install as ModuleInstallModel;
+use gplcart\modules\base\models\Install as InstallModel;
 use UnexpectedValueException;
 
 /**
  * Contains methods for installing Base profile
  */
-class Install extends BaseInstaller
+class Install extends Base
 {
 
     /**
@@ -35,9 +35,9 @@ class Install extends BaseInstaller
 
     /**
      * @param Module $module
-     * @param ModuleInstallModel $install_model
+     * @param InstallModel $install_model
      */
-    public function __construct(Module $module, ModuleInstallModel $install_model)
+    public function __construct(Module $module, InstallModel $install_model)
     {
         parent::__construct();
 

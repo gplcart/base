@@ -23,7 +23,6 @@ return array(
     // No dependencies
     'cli',
     'file_manager',
-    'currency',
     'demo',
     //'dev',
     'device',

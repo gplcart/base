@@ -5,7 +5,6 @@
 
     /**
      * Automatically submits step forms
-     * @returns {undefined}
      */
     Gplcart.onload.installAutosubmit = function () {
         var form = $('form[data-autosubmit="true"]');

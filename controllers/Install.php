@@ -9,14 +9,14 @@
 
 namespace gplcart\modules\base\controllers;
 
-use gplcart\core\Controller as BaseController;
+use gplcart\core\Controller;
 use gplcart\core\models\Install as InstallModel;
-use gplcart\modules\base\models\Install as ModuleModel;
+use gplcart\modules\base\models\Install as InstallModuleModel;
 
 /**
  * Handles incoming requests and outputs data related to Base module
  */
-class Install extends BaseController
+class Install extends Controller
 {
 
     /**
@@ -27,9 +27,9 @@ class Install extends BaseController
 
     /**
      * Base module model instance
-     * @var \gplcart\modules\base\models\Install $base_model
+     * @var \gplcart\modules\base\models\Install $install_model
      */
-    protected $base_model;
+    protected $install_model;
 
     /**
      * An array of installation data set in the session
@@ -57,14 +57,14 @@ class Install extends BaseController
 
     /**
      * @param InstallModel $install
-     * @param ModuleModel $base_model
+     * @param InstallModuleModel $base_model
      */
-    public function __construct(InstallModel $install, ModuleModel $base_model)
+    public function __construct(InstallModel $install, InstallModuleModel $base_model)
     {
         parent::__construct();
 
         $this->install = $install;
-        $this->base_model = $base_model;
+        $this->install_model = $base_model;
     }
 
     /**
@@ -83,7 +83,7 @@ class Install extends BaseController
         $this->setData('status', $this->data_status);
         $this->setData('handler', $this->data_handler);
         $this->setData('install', $this->data_install);
-        $this->setData('demo_handlers', $this->base_model->getDemoHandlers());
+        $this->setData('demo_handlers', $this->install_model->getDemoHandlers());
 
         $this->setJsStepInstall();
         $this->setCssStepInstall();
@@ -129,24 +129,23 @@ class Install extends BaseController
      */
     protected function submitStepInstall()
     {
-        if (!$this->isPosted('next')) {
-            return null;
+        if ($this->isPosted('next')) {
+
+            $this->setSubmitted('step');
+
+            $this->data_install['data']['step'] = $this->data_step;
+            $this->data_install['data'] = array_merge($this->data_install['data'], $this->getSubmitted());
+            $this->session->set('install', $this->data_install);
+
+            $result = $this->install->process($this->data_install['data']);
+
+            if (!empty($result['redirect'])) {
+                $this->redirect($result['redirect'], $result['message'], $result['severity']);
+            }
+
+            $this->data_status = false;
+            $this->setMessage($result['message'], $result['severity']);
         }
-
-        $this->setSubmitted('step');
-
-        $this->data_install['data']['step'] = $this->data_step;
-        $this->data_install['data'] = array_merge($this->data_install['data'], $this->getSubmitted());
-        $this->session->set('install', $this->data_install);
-
-        $result = $this->install->process($this->data_install['data']);
-
-        if (!empty($result['redirect'])) {
-            $this->redirect($result['redirect'], $result['message'], $result['severity']);
-        }
-
-        $this->data_status = false;
-        $this->setMessage($result['message'], $result['severity']);
     }
 
     /**

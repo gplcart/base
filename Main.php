@@ -9,8 +9,8 @@
 
 namespace gplcart\modules\base;
 
-use gplcart\core\Config,
-    gplcart\core\Container;
+use gplcart\core\Config;
+use gplcart\core\Container;
 
 /**
  * Main class for Base module
@@ -79,15 +79,13 @@ class Main
      */
     protected function setInstallHandlers(array &$handlers)
     {
-        $language = $this->getTranslationModel();
-
         $handlers['base'] = array(
             'module' => 'base',
-            'title' => $language->text('Base'),
+            'title' => gplcart_text('Base'),
             'steps' => array(
-                1 => array('title' => $language->text('Configure modules')),
-                2 => array('title' => $language->text('Create demo')),
-                3 => array('title' => $language->text('Finish installation'))
+                1 => array('title' => gplcart_text('Configure modules')),
+                2 => array('title' => gplcart_text('Create demo')),
+                3 => array('title' => gplcart_text('Finish installation'))
             ),
             'handlers' => array(
                 'install' => array('gplcart\\modules\\base\\handlers\\Install', 'install'),
@@ -105,12 +103,14 @@ class Main
      */
     protected function checkRequiredModules(array $data, &$result)
     {
-        if ($data['installer'] === 'base' && empty($data['step'])//
-                && !$this->getModel()->hasAllRequiredModules()) {
+        if ($data['installer'] === 'base'
+            && empty($data['step'])
+            && !$this->getModel()->hasAllRequiredModules()) {
+
             $result = array(
                 'redirect' => '',
                 'severity' => 'warning',
-                'message' => $this->getTranslationModel()->text('You cannot use this installer because some modules are missed in your distribution')
+                'message' => gplcart_text('You cannot use this installer because some modules are missed in your distribution')
             );
         }
     }
@@ -130,18 +130,11 @@ class Main
      * Returns the module model
      * @return \gplcart\modules\base\models\Install
      */
-    protected function getModel()
+    public function getModel()
     {
-        return Container::get('gplcart\\modules\\base\\models\\Install');
-    }
-
-    /**
-     * Translation UI model instance
-     * @return \gplcart\core\models\Translation
-     */
-    protected function getTranslationModel()
-    {
-        return Container::get('gplcart\\core\\models\\Translation');
+        /** @var \gplcart\modules\base\models\Install $instance */
+        $instance = Container::get('gplcart\\modules\\base\\models\\Install');
+        return $instance;
     }
 
 }
