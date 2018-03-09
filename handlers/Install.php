@@ -62,24 +62,35 @@ class Install extends Base
             return array();
         }
 
+        return $this->installHttp();
+    }
+
+    /**
+     * Performs installation via classic web UI
+     * @return array
+     */
+    protected function installHttp()
+    {
+        $result = array(
+            'message' => '',
+            'severity' => 'success',
+            'redirect' => 'install/' . ($this->data['step'] + 1)
+        );
+
         try {
 
             $this->start();
             $this->process();
 
-            return array(
-                'message' => '',
-                'severity' => 'success',
-                'redirect' => 'install/' . ($this->data['step'] + 1)
-            );
-
         } catch (Exception $ex) {
-            return array(
+            $result = array(
                 'redirect' => '',
                 'severity' => 'warning',
                 'message' => $ex->getMessage()
             );
         }
+
+        return $result;
     }
 
     /**
@@ -88,12 +99,11 @@ class Install extends Base
     protected function installCli()
     {
         try {
-
             $this->process();
             $this->installCliStep1();
             $this->installCliStep2();
             $this->installCliStep3();
-
+            $this->cli->line($this->getSuccessMessage());
         } catch (Exception $ex) {
             $this->cli->error($ex->getMessage());
         }
